@@ -1,0 +1,34 @@
+# Freesurfer Nifti Mask Conversion
+------------------------------------------------------------------------------------
+
+## Steps
+
+------------------------------------------------------------------------------------
+1. Convert Nifti to Freesurfer Format (.mgz)
+Use the mri_convert command to convert the Nifti file into Freesurfer's .mgz format.
+
+mri_convert /path/to/input.nii /path/to/output.mgz
+
+------------------------------------------------------------------------------------
+2. Register the Mask to Subject Space
+Align the converted .mgz file with the subject's T1 volume using mri_vol2vol.
+
+mri_vol2vol --mov /path/to/output.mgz \
+            --targ /path/to/T1.mgz \
+            --regheader --o /path/to/output_aligned.mgz
+
+------------------------------------------------------------------------------------
+
+3. Create a Binary Label
+Convert the aligned mask into a binary label using mri_binarize.
+
+mri_binarize --i /path/to/output_aligned.mgz \
+             --o /path/to/output_label.mgz \
+             --match 1
+------------------------------------------------------------------------------------
+
+4. Visualize the Results
+Use FreeView to inspect the alignment and mask.
+
+freeview -v /path/to/T1.mgz \
+         /path/to/output_label.mgz:colormap=jet:opacity=0.5
