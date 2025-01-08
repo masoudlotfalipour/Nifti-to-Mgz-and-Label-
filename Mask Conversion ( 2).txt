@@ -1,0 +1,45 @@
+Converting  Nifti Mask File
+
+1. Converting Nifti Mask to Freesurfer Format
+Freesurfer uses .mgz format for its files. We can use the mri_convert command to convert Nifti file to this format.
+
+mri_convert /home/masoud/Desktop/insula/Insula.nii /home/masoud/freesurfer/subjects/odp01/mri/Insula.mgz
+
+----------------------------------------------------------------------------------------------------------------
+
+2. Register the Mask to Subject Space
+We have to Ensure mask is in the same space as Freesurfer anatomical files (T1.mgz). Useing mri_vol2vol to align the mask with the Freesurfer T1 volume.
+
+
+mri_vol2vol --mov /home/masoud/freesurfer/subjects/odp01/mri/Insula.mgz \
+            --targ /home/masoud/freesurfer/subjects/odp01/mri/T1.mgz \
+            --regheader --o /home/masoud/freesurfer/subjects/odp01/mri/Insula_aligned.mgz
+
+-----------------------------------------------------------------------------------------------------------------
+
+
+3. Create a Label from the Mask
+The Freesurfer works with labels for regional analysis. We use mri_binarize to convert mask into a binary label file.
+
+
+mri_binarize --i /home/masoud/freesurfer/subjects/odp01/mri/Insula_aligned.mgz \
+             --o /home/masoud/freesurfer/subjects/odp01/mri/Insula_label.mgz \
+             --match 1
+
+----------------------------------------------------------------------------------------------------------------------
+
+4. Convert the Binary Mask to a Label
+We have to convert the binary mask into a Freesurfer label using mri_cor2label.
+
+
+mri_cor2label --i /home/masoud/freesurfer/subjects/odp01/mri/Insula_label.mgz \
+              --id 1 --l /home/masoud/freesurfer/subjects/odp01/label/Insula.label
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+5. FreeView
+We use freeview to check results
+
+freeview -v /home/masoud/freesurfer/subjects/odp01/mri/T1.mgz \
+               /home/masoud/freesurfer/subjects/odp01/mri/Insula_label.mgz:colormap=jet:opacity=0.5
